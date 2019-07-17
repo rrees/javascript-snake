@@ -45,4 +45,19 @@ function render() {
 
 render();
 
+
+let lastFrameTime = Date.now();
+
+function update() {
+	currentFrameTime = Date.now();
+	let deltaTime = currentFrameTime - lastFrameTime
+	lastFrameTime = currentFrameTime;
+	console.log(deltaTime, currentFrameTime, lastFrameTime);
+	
+	render();
+	window.requestAnimationFrame(update);
+}
+
+window.requestAnimationFrame(update);
+
 window.addEventListener('keyup', handleKeyPress, false);
