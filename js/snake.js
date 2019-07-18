@@ -1,21 +1,23 @@
 
 const size = 500;
+const pixelSize = 10;
 
 const backgroundColour = '#ffffff';
 const foregroundColour = '#000000';
+
+const maxMoveTimer = 100;
 
 const canvas = document.getElementById("bg");
 
 const ctx = canvas.getContext('2d');
 
-ctx.font = '50px serif';
-ctx.fillText("Hello world", 0,50);
-
-ctx.strokeRect(0, 0, size, size)
-
 const snake = [];
 
 snake.push({x: canvas.width/2, y: canvas.height/2});
+
+const game = {
+	over: false,
+}
 
 function handleKeyPress(event) {
 	console.log(event);
@@ -30,14 +32,31 @@ function drawBox(context, x, y, width, height, colour) {
 }
 
 function render() {
+	drawBox(
+		ctx,
+		0,
+		0,
+		size,
+		size,
+		backgroundColour
+	);
+	ctx.strokeRect(0, 0, size, size)
+
+	if(game['over']) {
+		ctx.font = '50px serif';
+		ctx.fillStyle = foregroundColour;
+		ctx.fillText("Game over!", 0, 50);
+		return;
+	}
+
 	snake.forEach(snakePart => {
 		console.log(snakePart);
 		drawBox(
 			ctx,
 			snakePart.x,
 			snakePart.y,
-			10,
-			10,
+			pixelSize,
+			pixelSize,
 			foregroundColour,
 			);
 	});
@@ -47,15 +66,44 @@ render();
 
 
 let lastFrameTime = Date.now();
+let moveTimer = 0;
+
+let nextMove = [0, -1];
+
+function checkCollision() {
+	const snakeHead = snake[0];
+	if(snakeHead.x < 0 || snakeHead.y < 0) {
+		game['over'] = true;
+	}
+}
 
 function update() {
 	currentFrameTime = Date.now();
-	let deltaTime = currentFrameTime - lastFrameTime
+	let deltaTime = currentFrameTime - lastFrameTime;
+
 	lastFrameTime = currentFrameTime;
-	console.log(deltaTime, currentFrameTime, lastFrameTime);
-	
+	moveTimer += deltaTime;
+
+	if( moveTimer > maxMoveTimer) {
+		moveTimer = 0;
+
+		const [nextX, nextY] = nextMove;
+
+		const snakeHead = snake[0];
+
+		snakeHead.x += nextX * pixelSize;
+		snakeHead.y += nextY * pixelSize;
+		console.log(snake);
+	}
+
+	console.log(deltaTime, currentFrameTime, lastFrameTime, moveTimer);
+	console.log(game);
+
+	checkCollision();
 	render();
-	window.requestAnimationFrame(update);
+	if (!game['over']) {
+		window.requestAnimationFrame(update);
+	}
 }
 
 window.requestAnimationFrame(update);
