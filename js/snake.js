@@ -11,7 +11,7 @@ const canvas = document.getElementById("bg");
 
 const ctx = canvas.getContext('2d');
 
-const snake = [];
+let snake = [];
 
 snake.push({x: canvas.width/2, y: canvas.height/2});
 
@@ -19,8 +19,38 @@ const game = {
 	over: false,
 }
 
+function restartGame() {
+	snake = [{x: canvas.width/2, y: canvas.height/2}];
+	game['over'] = false;
+}
+
+const moves = new Map([
+	['up', [0, -1]],
+	['left', [-1, 0]],
+	['right', [1, 0]],
+]);
+
 function handleKeyPress(event) {
 	console.log(event);
+	if(event.key === 'ArrowUp' || event.key === 'w') {
+		console.log('Up');
+		nextMove = moves.get('up');
+	}
+
+	if(event.key === 'ArrowLeft' || event.key === 'a') {
+		console.log('Left');
+		nextMove = moves.get('left');
+	}
+
+	if(event.key === 'ArrowRight' || event.key === 'd') {
+		console.log('Right');
+		nextMove = moves.get('right');
+	}
+
+	if(event.key === 'r') {
+		restartGame();
+		window.requestAnimationFrame(update);
+	}
 }
 
 function drawBox(context, x, y, width, height, colour) {
